@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecionando...</title>
+    <meta http-equiv="refresh" content="0; url=/felipesouto/" />
+    <script>
+      const path = location.pathname.replace("/felipesouto", "");
+      const search = location.search;
+      const hash = location.hash;
+      location.replace("/felipesouto/" + path + search + hash);
+    </script>
+  </head>
+  <body>
+    <p>Redirecionando...</p>
+  </body>
+</html>
