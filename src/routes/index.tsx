@@ -7,6 +7,7 @@ export function AppRoutes() {
     <Routes>
       <Route path="/" element={<DefaultLayout />}>
         <Route index element={<Home />} />
+        <Route path="sobre" element={<></>} />
       </Route>
     </Routes>
   );
