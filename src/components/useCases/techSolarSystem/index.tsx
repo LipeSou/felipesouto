@@ -4,13 +4,21 @@ import Planet from "../Planet";
 import Lights from "../Lights";
 import { OrbitControls } from "@react-three/drei";
 
+export interface PlanetType {
+  id: number;
+  color: string;
+  xRadius: number;
+  zRadius: number;
+  size: number;
+  speed: number;
+  offset: number;
+  rotationSpeed: number;
+}
+
 function TechSolarSystem() {
   const random = (a: number, b: number) => a + Math.random() * b;
-  const randomInt = (a: number, b: number) => Math.floor(random(a, b));
-  // const randomColor = () =>
-  //   `rgb(${randomInt(80, 50)}, ${randomInt(80, 50)}, ${randomInt(80, 50)})`;
 
-  const names = ["react", "vue", "typescript", "node", "next", "tailwind"];
+  // const names = ["react", "vue", "typescript", "node", "next", "tailwind"];
   const colors = [
     "#61DAFB",
     "#42B883",
@@ -20,7 +28,7 @@ function TechSolarSystem() {
     "#06B6D4",
   ];
 
-  const planetData = [];
+  const planetData: PlanetType[] = [];
   const totalPlanets = 6;
   for (let index = 0; index < totalPlanets; index++) {
     planetData.push({
