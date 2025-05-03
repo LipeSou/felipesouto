@@ -1,7 +1,12 @@
 import * as THREE from "three";
 
-function Ecliptic({ xRadius = 1, zRadius = 1 }) {
-  const points = [];
+interface EclipticProps {
+  xRadius?: number;
+  zRadius?: number;
+}
+
+function Ecliptic({ xRadius = 1, zRadius = 1 }: EclipticProps) {
+  const points: THREE.Vector3[] = [];
   for (let index = 0; index < 64; index++) {
     const angle = (index / 64) * 2 * Math.PI;
     const x = xRadius * Math.cos(angle);
@@ -13,9 +18,12 @@ function Ecliptic({ xRadius = 1, zRadius = 1 }) {
   const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
 
   return (
-    <line geometry={lineGeometry}>
-      <lineBasicMaterial attach="material" color="#BFBBDA" linewidth={10} />
-    </line>
+    <>
+      {/* @ts-expect-error: THREE.Line expects incorrect JSX type here */}
+      <line geometry={lineGeometry}>
+        <lineBasicMaterial attach="material" color="#BFBBDA" linewidth={10} />
+      </line>
+    </>
   );
 }
 
