@@ -4,7 +4,7 @@ import { Link, Outlet } from "react-router-dom";
 export default function DefaultLayout() {
   return (
     <div className="min-h-screen bg-theme text-theme flex flex-col">
-      <header className="p-4 flex items-center justify-between">
+      <header className="p-8 flex items-center justify-between">
         <nav>
           <Link to="/" className="font-theme text-2xl! font-bold!">
             Felipe Souto
@@ -18,7 +18,7 @@ export default function DefaultLayout() {
         </div>
       </header>
 
-      <main className="flex-1 p-8">
+      <main className="flex-1">
         <Outlet />
       </main>
 
