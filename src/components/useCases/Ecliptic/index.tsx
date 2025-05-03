@@ -1,3 +1,5 @@
+import { Line } from "@react-three/drei";
+import { useMemo } from "react";
 import * as THREE from "three";
 
 interface EclipticProps {
@@ -6,23 +8,20 @@ interface EclipticProps {
 }
 
 function Ecliptic({ xRadius = 1, zRadius = 1 }: EclipticProps) {
-  const points: THREE.Vector3[] = [];
-  for (let index = 0; index < 64; index++) {
-    const angle = (index / 64) * 2 * Math.PI;
-    const x = xRadius * Math.cos(angle);
-    const z = zRadius * Math.sin(angle);
-    points.push(new THREE.Vector3(x, 0, z));
-  }
-  points.push(points[0]); // fecha a elipse
-
-  const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+  const points = useMemo(() => {
+    const p: THREE.Vector3[] = [];
+    for (let i = 0; i <= 64; i++) {
+      const angle = (i / 64) * 2 * Math.PI;
+      const x = (xRadius ?? 1) * Math.cos(angle);
+      const z = (zRadius ?? 1) * Math.sin(angle);
+      p.push(new THREE.Vector3(x, 0, z));
+    }
+    return p;
+  }, [xRadius, zRadius]);
 
   return (
     <>
-      {/* @ts-expect-error: THREE.Line expects incorrect JSX type here */}
-      <line geometry={lineGeometry}>
-        <lineBasicMaterial attach="material" color="#BFBBDA" linewidth={10} />
-      </line>
+      <Line points={points} color="#BFBBDA" lineWidth={1.5} dashed={false} />
     </>
   );
 }
