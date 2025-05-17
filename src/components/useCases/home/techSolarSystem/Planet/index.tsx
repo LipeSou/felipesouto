@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import Ecliptic from "../Ecliptic";
 import React from "react";
-import type { PlanetType } from "../techSolarSystem";
+import type { PlanetType } from "..";
 import * as THREE from "three";
 
 interface PlanetProps {

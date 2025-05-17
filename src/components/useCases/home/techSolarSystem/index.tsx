@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
-import Sun from "../Sun";
-import Planet from "../Planet";
-import Lights from "../Lights";
+import Sun from "./Sun";
+import Planet from "./Planet";
+import Lights from "./Lights";
 import { OrbitControls } from "@react-three/drei";
 
 export interface PlanetType {
