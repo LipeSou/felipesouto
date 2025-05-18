@@ -108,7 +108,10 @@ export default class MainScene extends Phaser.Scene {
     });
 
     // Aplica o zoom da câmera
-    this.cameras.main.setZoom(1.6);
+    const screenW = this.scale.width;
+    const zoom = screenW < 800 ? 1.2 : 1.6;
+
+    this.cameras.main.setZoom(zoom);
 
     // Foca a câmera no personagem
     this.cameras.main.startFollow(this.player);
@@ -147,20 +150,21 @@ export default class MainScene extends Phaser.Scene {
     if (isMobile) {
       // cria botões mobile
       const btnLeft = this.add
-        .image(180, 288, "btn_left")
+        .image(80, 320, "btn_left")
         .setInteractive()
         .setScrollFactor(0)
         .setDisplaySize(32, 32);
       const btnRight = this.add
-        .image(260, 288, "btn_right")
+        .image(160, 320, "btn_right")
         .setInteractive()
         .setScrollFactor(0)
         .setDisplaySize(32, 32);
       const btnJump = this.add
-        .image(600, 288, "btn_jump")
+        .image(280, 320, "btn_jump")
         .setInteractive()
         .setScrollFactor(0)
         .setDisplaySize(32, 32);
+
       btnLeft.on("pointerdown", () => (this.leftPressed = true));
       btnLeft.on("pointerup", () => (this.leftPressed = false));
       btnLeft.on("pointerout", () => (this.leftPressed = false));

@@ -6,10 +6,15 @@ const GameCanvas: React.FC = () => {
   const gameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const isMobile = window.innerWidth < 800;
+
+    const width = isMobile ? window.innerWidth : 800;
+    const height = isMobile ? Math.min(400, window.innerHeight) : 400;
+
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
-      width: 800,
-      height: 400,
+      width,
+      height,
       backgroundColor: "#CCFFFF",
       parent: gameRef.current ?? undefined,
       physics: {
@@ -24,7 +29,18 @@ const GameCanvas: React.FC = () => {
 
     const game = new Phaser.Game(config);
 
+    const resize = () => {
+      const isMobile = window.innerWidth < 800;
+      const newWidth = isMobile ? window.innerWidth : 800;
+      const newHeight = isMobile ? Math.min(400, window.innerHeight) : 400;
+
+      game.scale.resize(newWidth, newHeight);
+    };
+
+    window.addEventListener("resize", resize);
+
     return () => {
+      window.removeEventListener("resize", resize);
       game.destroy(true);
     };
   }, []);
