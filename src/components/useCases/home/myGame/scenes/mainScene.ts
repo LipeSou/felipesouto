@@ -56,6 +56,10 @@ export default class MainScene extends Phaser.Scene {
     const isMobile =
       this.sys.game.device.os.android || this.sys.game.device.os.iOS;
 
+    // permite dois toques simultâneos
+    this.input.addPointer(2);
+    this.input.mouse.disableContextMenu();
+
     // Captura as teclas do teclado
     if (this.input?.keyboard?.createCursorKeys) {
       this.cursors = this.input?.keyboard?.createCursorKeys();
@@ -179,7 +183,6 @@ export default class MainScene extends Phaser.Scene {
       btnJump.on("pointerup", () => (this.jumpPressed = false));
       btnJump.on("pointerout", () => (this.jumpPressed = false));
       btnJump.on("pointerover", () => (this.jumpPressed = true));
-      btnJump.on("pointerout", () => (this.jumpPressed = false));
     }
   }
 
