@@ -57,7 +57,9 @@ export default class MainScene extends Phaser.Scene {
       this.sys.game.device.os.android || this.sys.game.device.os.iOS;
 
     // Captura as teclas do teclado
-    this.cursors = this.input?.keyboard?.createCursorKeys();
+    if (this.input?.keyboard?.createCursorKeys) {
+      this.cursors = this.input?.keyboard?.createCursorKeys();
+    }
 
     // Cria o chão
     const ground = this.physics.add.staticGroup();
@@ -142,35 +144,35 @@ export default class MainScene extends Phaser.Scene {
       if (e.code === "Space") e.preventDefault();
     });
 
-    // if (isMobile) {
-    // cria botões mobile
-    const btnLeft = this.add
-      .image(180, 288, "btn_left")
-      .setInteractive()
-      .setScrollFactor(0)
-      .setDisplaySize(32, 32);
-    const btnRight = this.add
-      .image(260, 288, "btn_right")
-      .setInteractive()
-      .setScrollFactor(0)
-      .setDisplaySize(32, 32);
-    const btnJump = this.add
-      .image(600, 288, "btn_jump")
-      .setInteractive()
-      .setScrollFactor(0)
-      .setDisplaySize(32, 32);
-    btnLeft.on("pointerdown", () => (this.leftPressed = true));
-    btnLeft.on("pointerup", () => (this.leftPressed = false));
-    btnLeft.on("pointerout", () => (this.leftPressed = false));
+    if (isMobile) {
+      // cria botões mobile
+      const btnLeft = this.add
+        .image(180, 288, "btn_left")
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDisplaySize(32, 32);
+      const btnRight = this.add
+        .image(260, 288, "btn_right")
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDisplaySize(32, 32);
+      const btnJump = this.add
+        .image(600, 288, "btn_jump")
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDisplaySize(32, 32);
+      btnLeft.on("pointerdown", () => (this.leftPressed = true));
+      btnLeft.on("pointerup", () => (this.leftPressed = false));
+      btnLeft.on("pointerout", () => (this.leftPressed = false));
 
-    btnRight.on("pointerdown", () => (this.rightPressed = true));
-    btnRight.on("pointerup", () => (this.rightPressed = false));
-    btnRight.on("pointerout", () => (this.rightPressed = false));
+      btnRight.on("pointerdown", () => (this.rightPressed = true));
+      btnRight.on("pointerup", () => (this.rightPressed = false));
+      btnRight.on("pointerout", () => (this.rightPressed = false));
 
-    btnJump.on("pointerdown", () => (this.jumpPressed = true));
-    btnJump.on("pointerup", () => (this.jumpPressed = false));
-    btnJump.on("pointerout", () => (this.jumpPressed = false));
-    // }
+      btnJump.on("pointerdown", () => (this.jumpPressed = true));
+      btnJump.on("pointerup", () => (this.jumpPressed = false));
+      btnJump.on("pointerout", () => (this.jumpPressed = false));
+    }
   }
 
   update() {

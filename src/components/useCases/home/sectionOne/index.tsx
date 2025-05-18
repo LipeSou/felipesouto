@@ -1,5 +1,4 @@
 import GameCanvas from "../myGame/GameCanva";
-import TechSolarSystem from "../techSolarSystem";
 
 export default function SectionOne() {
   return (

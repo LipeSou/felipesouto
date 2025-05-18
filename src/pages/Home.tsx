@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="  md:px-11">
       <SectionOne />
-      {/* <SectionTwo /> */}
+      <SectionTwo />
     </div>
   );
 }
