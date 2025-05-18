@@ -58,7 +58,7 @@ export default class MainScene extends Phaser.Scene {
 
     // permite dois toques simultâneos
     this.input.addPointer(2);
-    this.input.mouse.disableContextMenu();
+    this.input.mouse?.disableContextMenu();
 
     // Captura as teclas do teclado
     if (this.input?.keyboard?.createCursorKeys) {
