@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import Phaser from "phaser";
 import MainScene from "../scenes/mainScene";
+import StartScene from "../scenes/startScene";
 
 const GameCanvas: React.FC = () => {
   const gameRef = useRef<HTMLDivElement>(null);
@@ -24,7 +25,7 @@ const GameCanvas: React.FC = () => {
           debug: false,
         },
       },
-      scene: [MainScene],
+      scene: [StartScene, MainScene],
     };
 
     const game = new Phaser.Game(config);

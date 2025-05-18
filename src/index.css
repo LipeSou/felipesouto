@@ -16,6 +16,7 @@
   :root {
     --text-theme: #0f0602;
     --bg-theme: #f0f5fa;
+    --primary-theme: #167c80;
   }
 
   body {
