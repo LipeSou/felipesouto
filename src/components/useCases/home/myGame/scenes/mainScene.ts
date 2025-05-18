@@ -168,13 +168,17 @@ export default class MainScene extends Phaser.Scene {
       btnLeft.on("pointerdown", () => (this.leftPressed = true));
       btnLeft.on("pointerup", () => (this.leftPressed = false));
       btnLeft.on("pointerout", () => (this.leftPressed = false));
+      btnLeft.on("pointerover", () => (this.leftPressed = true));
 
       btnRight.on("pointerdown", () => (this.rightPressed = true));
       btnRight.on("pointerup", () => (this.rightPressed = false));
       btnRight.on("pointerout", () => (this.rightPressed = false));
+      btnRight.on("pointerover", () => (this.rightPressed = true));
 
       btnJump.on("pointerdown", () => (this.jumpPressed = true));
       btnJump.on("pointerup", () => (this.jumpPressed = false));
+      btnJump.on("pointerout", () => (this.jumpPressed = false));
+      btnJump.on("pointerover", () => (this.jumpPressed = true));
       btnJump.on("pointerout", () => (this.jumpPressed = false));
     }
   }
