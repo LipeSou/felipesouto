@@ -5,10 +5,11 @@ export default class StartScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
-    this.cameras.main.setBackgroundColor("#F0F5FA");
+
+    // Background e borda
+    this.cameras.main.setBackgroundColor("#FFFFFF");
     const graphics = this.add.graphics().setScrollFactor(0);
-    graphics.lineStyle(3, 0x0f0602); // espessura e cor da borda
-    graphics.strokeRect(0, 0, width, height);
+    graphics.lineStyle(0.5, 0x0f0602);
     graphics.strokeRoundedRect(0, 0, width, height, 12);
 
     // this.add.rectangle(0, 0, width, height, 0x000000, 0.8).setOrigin(0);
