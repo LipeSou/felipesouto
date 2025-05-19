@@ -31,7 +31,7 @@ export default class StartScene extends Phaser.Scene {
       .text(width / 2, height / 2 + 30, "Jogar", {
         fontSize: "28px",
         color: "#F5FAFF",
-        backgroundColor: "#167C80",
+        backgroundColor: "#0070d1",
         padding: { x: 20, y: 10 },
       })
       .setOrigin(0.5)
