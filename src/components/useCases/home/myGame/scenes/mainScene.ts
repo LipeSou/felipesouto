@@ -1,6 +1,9 @@
 import Phaser from "phaser";
 
 export default class MainScene extends Phaser.Scene {
+  // limite para o caso dele cair
+  private deathY = 600;
+
   private player!: Phaser.Physics.Arcade.Sprite;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -223,5 +226,17 @@ export default class MainScene extends Phaser.Scene {
     } else {
       this.player.setVelocityX(0);
     }
+
+    if (this.player.y > this.deathY) {
+      this.handlePlayerDeath();
+    }
+  }
+
+  private handlePlayerDeath() {
+    this.player.setTint(0xff0000);
+    this.player.anims.pause();
+    this.time.delayedCall(1000, () => {
+      this.scene.restart();
+    });
   }
 }
