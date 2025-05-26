@@ -1,5 +1,5 @@
 import SectionOne from "../components/useCases/home/sectionOne";
-import SectionTwo from "../components/useCases/home/sectionTwo";
+import Experiences from "../components/useCases/home/experiences";
 
 export default function Home() {
   return (
@@ -7,7 +7,7 @@ export default function Home() {
       <div className="my-16 md:flex justify-center">
         <SectionOne />
       </div>
-      <SectionTwo />
+      <Experiences />
     </div>
   );
 }
