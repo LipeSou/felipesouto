@@ -9,7 +9,7 @@ const GameCanvas: React.FC = () => {
   useEffect(() => {
     const isMobile = window.innerWidth < 800;
 
-    const width = isMobile ? window.innerWidth : 800;
+    const width = isMobile ? window.innerWidth - 30 : 800;
     const height = isMobile ? Math.min(400, window.innerHeight) : 400;
 
     const config: Phaser.Types.Core.GameConfig = {

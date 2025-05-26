@@ -21,7 +21,7 @@ export const myExperiences: Experiences[] = [
   },
   {
     title: "Front End React",
-    job: "SGE Tecnologia;",
+    job: "SGE Tecnologia",
     date: "set de 2021 - jun de 2022",
     time: "10 meses",
     contents: [],

@@ -25,10 +25,10 @@ export const Timeline = ({ data }: { data: Experiences[] }) => {
   return (
     <div className="w-full bg-theme  font-sans md:px-10" ref={containerRef}>
       <div className="max-w-7xl mx-auto pt-20 px-4 md:px-8 lg:px-10">
-        <h2 className="text-lg md:text-4xl mb-4  max-w-4xl">
+        <h2 className="text-2xl md:text-4xl mb-4  max-w-4xl">
           Minhas experiências
         </h2>
-        <p className="text-neutral-700  text-sm md:text-base max-w-sm">
+        <p className="font-light  text-base md:text-base max-w-sm">
           Eu tenho trabalhado profissionalmente de Front-End nos últimos 4 anos.
           Aqui está uma linha do tempo da minha jornada.
         </p>
@@ -54,8 +54,9 @@ export const Timeline = ({ data }: { data: Experiences[] }) => {
             </div>
 
             <div className="relative w-full pl-20 pr-4 md:pl-4">
-              <div className="block mb-4 text-2xl font-bold text-left text-neutral-300 md:hidden ">
-                <h3>{item.date}</h3>
+              <div className="block mb-4 text-2xl font-bold text-left text-neutral-500 tex md:hidden ">
+                <h3 className="text-base font-bold">{item.date}</h3>
+                <h3 className="text-base font-bold">{item.time}</h3>
                 <h3>{item.job}</h3>
               </div>
               {item.contents.map((content, index) => (
@@ -77,7 +78,7 @@ export const Timeline = ({ data }: { data: Experiences[] }) => {
               height: heightTransform,
               opacity: opacityTransform,
             }}
-            className="absolute inset-x-0 top-0  w-[2px] bg-gradient-to-t from-purple-500 via-lavender/50 to-transparent from-[0%] via-[10%] rounded-full"
+            className="absolute inset-x-0 top-0  w-[2px] bg-gradient-to-t from-[#0070d1] via-lavender/50 to-transparent from-[0%] via-[10%] rounded-full"
           />
         </div>
       </div>

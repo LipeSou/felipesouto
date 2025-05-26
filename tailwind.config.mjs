@@ -2,7 +2,7 @@
 export default {
   content: [
     './index.html',
-    './src/**/*.{js,ts,jsx,tsx}', // adapta se necessário
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
@@ -17,7 +17,7 @@ export default {
         popover: 'hsl(var(--popover) / <alpha-value>)',
         'popover-foreground': 'hsl(var(--popover-foreground) / <alpha-value>)',
 
-        primary: 'hsl(var(--primary) / <alpha-value>)',
+        primary: 'hsl(var(--primary-theme) / <alpha-value>)',
         'primary-foreground': 'hsl(var(--primary-foreground) / <alpha-value>)',
 
         secondary: 'hsl(var(--secondary) / <alpha-value>)',

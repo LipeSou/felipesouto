@@ -24,7 +24,7 @@ export default function DefaultLayout() {
         <Outlet />
       </main>
 
-      <footer className="p-4 pt-80 text-center text-sm font-text">
+      <footer className="p-4 pt-[1000px] text-center text-sm font-text">
         <p>© {new Date().getFullYear()} Felipe Souto</p>
       </footer>
     </div>
