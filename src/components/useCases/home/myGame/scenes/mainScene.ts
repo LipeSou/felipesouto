@@ -100,7 +100,7 @@ export default class MainScene extends Phaser.Scene {
         start: 0,
         end: 7,
       }),
-      frameRate: 5,
+      frameRate: 6,
       repeat: -1,
     });
 
@@ -116,7 +116,7 @@ export default class MainScene extends Phaser.Scene {
 
     // Aplica o zoom da câmera
     const screenW = this.scale.width;
-    const zoom = screenW < 800 ? 1.2 : 1.2;
+    const zoom = screenW < 800 ? 1 : 1.2;
 
     this.cameras.main.setZoom(zoom);
 
