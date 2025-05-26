@@ -1,4 +1,6 @@
-export const myExperiences = [
+import type { Experiences } from "../types/timeline";
+
+export const myExperiences: Experiences[] = [
   {
     title: "Front End Vue",
     job: "App Facilita",
