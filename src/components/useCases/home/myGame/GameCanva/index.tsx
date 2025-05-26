@@ -16,7 +16,7 @@ const GameCanvas: React.FC = () => {
       type: Phaser.AUTO,
       width,
       height,
-      backgroundColor: "#CCFFFF",
+      backgroundColor: "#E3E9FF",
       parent: gameRef.current ?? undefined,
       physics: {
         default: "arcade",

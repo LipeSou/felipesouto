@@ -20,24 +20,24 @@ export default class MainScene extends Phaser.Scene {
       "player_idle",
       import.meta.env.BASE_URL + "assets/PlayerIdle.png",
       {
-        frameWidth: 48,
-        frameHeight: 48,
+        frameWidth: 128,
+        frameHeight: 128,
       }
     );
     this.load.spritesheet(
       "player_run",
       import.meta.env.BASE_URL + "assets/PlayerRun.png",
       {
-        frameWidth: 48,
-        frameHeight: 48,
+        frameWidth: 128,
+        frameHeight: 128,
       }
     );
     this.load.spritesheet(
       "player_jump",
-      import.meta.env.BASE_URL + "assets/PlayerJump.png",
+      import.meta.env.BASE_URL + "assets/PlayerIdle.png",
       {
-        frameWidth: 48,
-        frameHeight: 48,
+        frameWidth: 128,
+        frameHeight: 128,
       }
     );
     this.load.image("ground", import.meta.env.BASE_URL + "assets/Platform.png");
@@ -70,10 +70,10 @@ export default class MainScene extends Phaser.Scene {
 
     // Cria o chão
     const ground = this.physics.add.staticGroup();
-    ground.create(400, 580, "ground").setScale(2).refreshBody();
+    ground.create(300, 610, "ground").setScale(1).refreshBody();
 
     // Cria o jogador
-    this.player = this.physics.add.sprite(100, 300, "player_idle");
+    this.player = this.physics.add.sprite(100, 300, "player_idle").setScale(1);
     this.player.setOrigin(0.5, 1);
     this.player.setBounce(0.2); // faz ele "quicar" um pouco
 
@@ -88,9 +88,9 @@ export default class MainScene extends Phaser.Scene {
       key: "idle",
       frames: this.anims.generateFrameNumbers("player_idle", {
         start: 0,
-        end: 9,
+        end: 7,
       }),
-      frameRate: 8,
+      frameRate: 3,
       repeat: -1,
     });
 
@@ -100,23 +100,23 @@ export default class MainScene extends Phaser.Scene {
         start: 0,
         end: 7,
       }),
-      frameRate: 12,
+      frameRate: 5,
       repeat: -1,
     });
 
     this.anims.create({
       key: "jump",
-      frames: this.anims.generateFrameNumbers("player_jump", {
+      frames: this.anims.generateFrameNumbers("player_run", {
         start: 0,
-        end: 5,
+        end: 0,
       }),
-      frameRate: 8,
+      frameRate: 4,
       repeat: -1,
     });
 
     // Aplica o zoom da câmera
     const screenW = this.scale.width;
-    const zoom = screenW < 800 ? 1.2 : 1.6;
+    const zoom = screenW < 800 ? 1.2 : 1.2;
 
     this.cameras.main.setZoom(zoom);
 
