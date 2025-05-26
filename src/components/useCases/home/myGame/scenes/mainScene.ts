@@ -90,7 +90,7 @@ export default class MainScene extends Phaser.Scene {
         start: 0,
         end: 7,
       }),
-      frameRate: 3,
+      frameRate: 1,
       repeat: -1,
     });
 
@@ -100,7 +100,7 @@ export default class MainScene extends Phaser.Scene {
         start: 0,
         end: 7,
       }),
-      frameRate: 6,
+      frameRate: 8,
       repeat: -1,
     });
 
