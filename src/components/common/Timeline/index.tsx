@@ -25,10 +25,10 @@ export const Timeline = ({ data }: { data: Experiences[] }) => {
   return (
     <div className="w-full bg-theme  font-sans md:px-10" ref={containerRef}>
       <div className="max-w-7xl mx-auto pt-20 px-4 md:px-8 lg:px-10">
-        <h2 className="text-2xl md:text-4xl mb-4  max-w-4xl">
+        <h2 className="font-title text-2xl md:text-4xl mb-6  max-w-4xl">
           Minhas experiências
         </h2>
-        <p className="font-light  text-base md:text-base max-w-sm">
+        <p className=" text-base md:text-xl max-w-sm">
           Eu tenho trabalhado profissionalmente de Front-End nos últimos 4 anos.
           Aqui está uma linha do tempo da minha jornada.
         </p>
@@ -43,24 +43,25 @@ export const Timeline = ({ data }: { data: Experiences[] }) => {
               <div className="absolute flex items-center justify-center w-10 h-10 rounded-full -left-[15px] bg-midnight">
                 <div className="w-4 h-4 p-2 border rounded-full bg-neutral-800 border-neutral-700" />
               </div>
-              <div className="flex-col hidden gap-2 font-bold md:flex md:pl-20 md:text-4xl ">
+              <div className="flex-col hidden gap-2 font-semibold md:flex md:pl-20 md:text-4xl ">
+                <h3 className="text-3xl">{item.title}</h3>
+                <h3 className=" font-title text-2xl md:text-4xl">{item.job}</h3>
                 <div>
-                  <h3 className="text-base">{item.date}</h3>
-                  <h3 className="text-base">{item.time}</h3>
+                  <h3 className="text-lg font-normal">{item.date}</h3>
+                  <h3 className="text-lg font-normal">{item.time}</h3>
                 </div>
-                <h3 className="text-3xl text-neutral-500">{item.title}</h3>
-                <h3 className="text-3xl text-neutral-400">{item.job}</h3>
               </div>
             </div>
 
             <div className="relative w-full pl-20 pr-4 md:pl-4">
-              <div className="block mb-4 text-2xl font-bold text-left text-neutral-500 tex md:hidden ">
+              <div className="block mb-4 text-xl font-bold text-left text-neutral-500 tex md:hidden ">
+                <h3 className="text-2xl">{item.title}</h3>
+                <h3>{item.job}</h3>
                 <h3 className="text-base font-bold">{item.date}</h3>
                 <h3 className="text-base font-bold">{item.time}</h3>
-                <h3>{item.job}</h3>
               </div>
               {item.contents.map((content, index) => (
-                <p className="mb-3 font-normal text-neutral-400" key={index}>
+                <p className="mb-3 font-normal " key={index}>
                   {content}
                 </p>
               ))}

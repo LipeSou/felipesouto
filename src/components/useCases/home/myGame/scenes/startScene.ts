@@ -8,11 +8,7 @@ export default class StartScene extends Phaser.Scene {
 
     // Background e borda
     this.cameras.main.setBackgroundColor("#FFFFFF");
-    const graphics = this.add.graphics().setScrollFactor(0);
-    graphics.lineStyle(0.5, 0x0f0602);
-    graphics.strokeRoundedRect(0, 0, width, height, 12);
 
-    // this.add.rectangle(0, 0, width, height, 0x000000, 0.8).setOrigin(0);
     this.add
       .text(
         width / 2,
@@ -38,7 +34,7 @@ export default class StartScene extends Phaser.Scene {
       .setInteractive();
 
     btn.on("pointerdown", () => {
-      this.scene.start("MainScene"); // inicia o jogo real
+      this.scene.start("MainScene");
     });
   }
 }
