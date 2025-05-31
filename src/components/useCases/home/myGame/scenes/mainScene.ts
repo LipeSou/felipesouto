@@ -30,6 +30,7 @@ export default class MainScene extends Phaser.Scene {
       import.meta.env.BASE_URL + "assets/PlayerIdle.png",
       { frameWidth: 128, frameHeight: 128 }
     ); // Trocar se tiver animação própria de jump
+    this.load.image("bug", import.meta.env.BASE_URL + "assets/bug.png");
 
     // Imagens
     this.load.image("ground", import.meta.env.BASE_URL + "assets/Platform.png");
@@ -45,7 +46,6 @@ export default class MainScene extends Phaser.Scene {
       "btn_jump",
       import.meta.env.BASE_URL + "assets/ButtonJump.png"
     );
-    this.load.image("bug", import.meta.env.BASE_URL + "assets/bug.png");
   }
 
   create() {
@@ -192,29 +192,30 @@ export default class MainScene extends Phaser.Scene {
         .image(x, y, key)
         .setInteractive()
         .setScrollFactor(0)
-        .setDisplaySize(32, 32);
+        .setDisplaySize(32, 32)
+        .setAlpha(0.5);
       btn.on("pointerdown", onDown);
       btn.on("pointerup", onUp);
       btn.on("pointerout", onUp);
       btn.on("pointerover", onDown);
     };
     mkBtn(
-      80,
-      320,
+      40,
+      360,
       "btn_left",
       () => (this.leftPressed = true),
       () => (this.leftPressed = false)
     );
     mkBtn(
-      160,
-      320,
+      130,
+      360,
       "btn_right",
       () => (this.rightPressed = true),
       () => (this.rightPressed = false)
     );
     mkBtn(
       280,
-      320,
+      360,
       "btn_jump",
       () => (this.jumpPressed = true),
       () => (this.jumpPressed = false)
