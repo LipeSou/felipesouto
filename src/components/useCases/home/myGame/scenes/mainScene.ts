@@ -1,45 +1,37 @@
 import Phaser from "phaser";
 
 export default class MainScene extends Phaser.Scene {
-  // limite para o caso dele cair
-  private deathY = 600;
-
+  private readonly deathY = 600;
   private player!: Phaser.Physics.Arcade.Sprite;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-
   private leftPressed = false;
   private rightPressed = false;
   private jumpPressed = false;
+  private ground!: Phaser.Physics.Arcade.StaticGroup;
 
   constructor() {
     super("MainScene");
   }
 
   preload() {
+    // Spritesheets
     this.load.spritesheet(
       "player_idle",
       import.meta.env.BASE_URL + "assets/PlayerIdle.png",
-      {
-        frameWidth: 128,
-        frameHeight: 128,
-      }
+      { frameWidth: 128, frameHeight: 128 }
     );
     this.load.spritesheet(
       "player_run",
       import.meta.env.BASE_URL + "assets/PlayerRun.png",
-      {
-        frameWidth: 128,
-        frameHeight: 128,
-      }
+      { frameWidth: 128, frameHeight: 128 }
     );
     this.load.spritesheet(
       "player_jump",
       import.meta.env.BASE_URL + "assets/PlayerIdle.png",
-      {
-        frameWidth: 128,
-        frameHeight: 128,
-      }
-    );
+      { frameWidth: 128, frameHeight: 128 }
+    ); // Trocar se tiver animação própria de jump
+
+    // Imagens
     this.load.image("ground", import.meta.env.BASE_URL + "assets/Platform.png");
     this.load.image(
       "btn_left",
@@ -53,168 +45,70 @@ export default class MainScene extends Phaser.Scene {
       "btn_jump",
       import.meta.env.BASE_URL + "assets/ButtonJump.png"
     );
+    this.load.image(
+      "bug",
+      "https://opengameart.org/sites/default/files/enemy-bug.png"
+    );
   }
 
   create() {
     const isMobile =
       this.sys.game.device.os.android || this.sys.game.device.os.iOS;
 
-    // permite dois toques simultâneos
+    // Multi-touch
     this.input.addPointer(2);
     this.input.mouse?.disableContextMenu();
 
-    // Captura as teclas do teclado
-    if (this.input?.keyboard?.createCursorKeys) {
-      this.cursors = this.input?.keyboard?.createCursorKeys();
+    // Input
+    if (this.input.keyboard) {
+      this.cursors = this.input.keyboard.createCursorKeys();
+    } else {
+      // Lide com a ausência do teclado (ex: mobile puro)
+      this.cursors = undefined as never;
     }
 
-    // Cria o chão
-    const ground = this.physics.add.staticGroup();
-    ground.create(300, 610, "ground").setScale(1).refreshBody();
-
-    // Cria o jogador
-    this.player = this.physics.add.sprite(100, 300, "player_idle").setScale(1);
-    this.player.setOrigin(0.5, 1);
-    this.player.setBounce(0.2); // faz ele "quicar" um pouco
-
-    // Define os limites do mundo
+    // Mapa e chão
     this.physics.world.setBounds(0, 0, 1600, 600);
     this.cameras.main.setBounds(0, 0, 1600, 600);
+    this.ground = this.physics.add.staticGroup();
+    this.ground.create(300, 610, "ground").setScale(1).refreshBody();
 
-    this.player.setCollideWorldBounds(true); // impede de sair da tela
+    // Player
+    this.player = this.physics.add
+      .sprite(100, 460, "player_idle")
+      .setOrigin(0.5, 1);
+    this.player.setCollideWorldBounds(true);
     this.player.setOffset(0, -8);
 
-    this.anims.create({
-      key: "idle",
-      frames: this.anims.generateFrameNumbers("player_idle", {
-        start: 0,
-        end: 7,
-      }),
-      frameRate: 1,
-      repeat: -1,
-    });
+    // Animações
+    this.createAnimations();
 
-    this.anims.create({
-      key: "run",
-      frames: this.anims.generateFrameNumbers("player_run", {
-        start: 0,
-        end: 7,
-      }),
-      frameRate: 8,
-      repeat: -1,
-    });
+    // Câmera
+    this.configCamera();
 
-    this.anims.create({
-      key: "jump",
-      frames: this.anims.generateFrameNumbers("player_run", {
-        start: 0,
-        end: 0,
-      }),
-      frameRate: 4,
-      repeat: -1,
-    });
+    // Controles mobile
+    if (isMobile) this.createMobileControls();
 
-    // Aplica o zoom da câmera
-    const screenW = this.scale.width;
-    const zoom = screenW < 800 ? 1 : 1.2;
+    // Físicas
+    this.physics.add.collider(this.player, this.ground);
 
-    this.cameras.main.setZoom(zoom);
+    // Inimigos
+    this.spawnBug(400, 565);
 
-    // Foca a câmera no personagem
-    this.cameras.main.startFollow(this.player);
-
-    // Define limites da câmera se necessário
-    // this.cameras.main.setBounds(0, 0, larguraTotalDoMapa, alturaTotalDoMapa);
-    this.cameras.main.startFollow(this.player);
-    this.cameras.main.setFollowOffset(0, 45); // move a câmera 100px para cima
-
-    this.cameras.main.setDeadzone(0, 50); // tolerância vertical
-
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-160);
-      this.player.play("run", true);
-      this.player.setFlipX(true); // vira o sprite para a esquerda
-    }
-    // Movimento para a direita
-    else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(160);
-      this.player.play("run", true);
-      this.player.setFlipX(false);
-    }
-    // Parado
-    else {
-      this.player.setVelocityX(0);
-      this.player.play("idle", true);
-    }
-
-    // Adiciona colisão com o chão
-    this.physics.add.collider(this.player, ground);
-
+    // Evita scroll ao pressionar espaço
     window.addEventListener("keydown", (e) => {
       if (e.code === "Space") e.preventDefault();
     });
-
-    if (isMobile) {
-      // cria botões mobile
-      const btnLeft = this.add
-        .image(80, 320, "btn_left")
-        .setInteractive()
-        .setScrollFactor(0)
-        .setDisplaySize(32, 32);
-      const btnRight = this.add
-        .image(160, 320, "btn_right")
-        .setInteractive()
-        .setScrollFactor(0)
-        .setDisplaySize(32, 32);
-      const btnJump = this.add
-        .image(280, 320, "btn_jump")
-        .setInteractive()
-        .setScrollFactor(0)
-        .setDisplaySize(32, 32);
-
-      btnLeft.on("pointerdown", () => (this.leftPressed = true));
-      btnLeft.on("pointerup", () => (this.leftPressed = false));
-      btnLeft.on("pointerout", () => (this.leftPressed = false));
-      btnLeft.on("pointerover", () => (this.leftPressed = true));
-
-      btnRight.on("pointerdown", () => (this.rightPressed = true));
-      btnRight.on("pointerup", () => (this.rightPressed = false));
-      btnRight.on("pointerout", () => (this.rightPressed = false));
-      btnRight.on("pointerover", () => (this.rightPressed = true));
-
-      btnJump.on("pointerdown", () => (this.jumpPressed = true));
-      btnJump.on("pointerup", () => (this.jumpPressed = false));
-      btnJump.on("pointerout", () => (this.jumpPressed = false));
-      btnJump.on("pointerover", () => (this.jumpPressed = true));
-    }
   }
 
   update() {
-    // movimentação, física, lógica de jogo
     if (!this.cursors) return;
-
-    // Combina teclado e toque
     const moveLeft = this.cursors.left.isDown || this.leftPressed;
     const moveRight = this.cursors.right.isDown || this.rightPressed;
     const jump =
       this.cursors.up.isDown || this.cursors.space?.isDown || this.jumpPressed;
-
     const isTouchingGround = this.player.body?.touching.down;
     const isMoving = moveLeft || moveRight;
-
-    // Pulo
-    if (jump && isTouchingGround) {
-      this.player.setVelocityY(-330);
-    }
-
-    // Animações
-    if (!isTouchingGround) {
-      this.player.play("jump", true);
-    } else if (isMoving) {
-      this.player.play("run", true);
-    } else {
-      this.player.play("idle", true);
-    }
 
     // Movimento lateral
     if (moveLeft) {
@@ -227,16 +121,108 @@ export default class MainScene extends Phaser.Scene {
       this.player.setVelocityX(0);
     }
 
-    if (this.player.y > this.deathY) {
-      this.handlePlayerDeath();
-    }
+    // Pulo
+    if (jump && isTouchingGround) this.player.setVelocityY(-330);
+
+    // Animação
+    if (!isTouchingGround) this.player.play("jump", true);
+    else if (isMoving) this.player.play("run", true);
+    else this.player.play("idle", true);
+
+    // "Morte"
+    if (this.player.y > this.deathY) this.handlePlayerDeath();
+  }
+
+  private createAnimations() {
+    // Se quiser refinar, pode criar um utilitário para evitar repetição
+    this.anims.create({
+      key: "idle",
+      frames: this.anims.generateFrameNumbers("player_idle", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 1,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "run",
+      frames: this.anims.generateFrameNumbers("player_run", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "jump",
+      frames: this.anims.generateFrameNumbers("player_run", {
+        start: 0,
+        end: 0,
+      }),
+      frameRate: 4,
+      repeat: -1,
+    });
+  }
+
+  private configCamera() {
+    const zoom = this.scale.width < 800 ? 1 : 1.2;
+    this.cameras.main.setZoom(zoom);
+    this.cameras.main.startFollow(this.player);
+    this.cameras.main.setFollowOffset(0, 45);
+    this.cameras.main.setDeadzone(0, 50);
+  }
+
+  private createMobileControls() {
+    const mkBtn = (
+      x: number,
+      y: number,
+      key: string,
+      onDown: () => void,
+      onUp: () => void
+    ) => {
+      const btn = this.add
+        .image(x, y, key)
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDisplaySize(32, 32);
+      btn.on("pointerdown", onDown);
+      btn.on("pointerup", onUp);
+      btn.on("pointerout", onUp);
+      btn.on("pointerover", onDown);
+    };
+    mkBtn(
+      80,
+      320,
+      "btn_left",
+      () => (this.leftPressed = true),
+      () => (this.leftPressed = false)
+    );
+    mkBtn(
+      160,
+      320,
+      "btn_right",
+      () => (this.rightPressed = true),
+      () => (this.rightPressed = false)
+    );
+    mkBtn(
+      280,
+      320,
+      "btn_jump",
+      () => (this.jumpPressed = true),
+      () => (this.jumpPressed = false)
+    );
+  }
+
+  private spawnBug(x: number, y: number) {
+    const bug = this.physics.add.sprite(x, y, "bug").setScale(1);
+    bug.setImmovable(true);
+    bug.body.allowGravity = false;
+    this.physics.add.overlap(this.player, bug, () => this.handlePlayerDeath());
   }
 
   private handlePlayerDeath() {
     this.player.setTint(0xff0000);
     this.player.anims.pause();
-    this.time.delayedCall(1000, () => {
-      this.scene.restart();
-    });
+    this.time.delayedCall(1000, () => this.scene.restart());
   }
 }

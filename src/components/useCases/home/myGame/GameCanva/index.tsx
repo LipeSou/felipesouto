@@ -1,23 +1,32 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef, useLayoutEffect } from "react";
 import Phaser from "phaser";
 import MainScene from "../scenes/mainScene";
 import StartScene from "../scenes/startScene";
 
-const GameCanvas: React.FC = () => {
-  const gameRef = useRef<HTMLDivElement>(null);
+function getGameDimensions() {
+  const isMobile = window.innerWidth < 800;
+  return {
+    width: isMobile ? window.innerWidth - 30 : 800,
+    height: isMobile ? Math.min(400, window.innerHeight) : 400,
+  };
+}
 
-  useEffect(() => {
-    const isMobile = window.innerWidth < 800;
+const usePhaserGame = (
+  containerRef: React.RefObject<HTMLDivElement | null>
+) => {
+  useLayoutEffect(() => {
+    if (!containerRef?.current) return;
 
-    const width = isMobile ? window.innerWidth - 30 : 800;
-    const height = isMobile ? Math.min(400, window.innerHeight) : 400;
+    let game: Phaser.Game | null = null;
+
+    const { width, height } = getGameDimensions();
 
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
       width,
       height,
       backgroundColor: "#E3E9FF",
-      parent: gameRef.current ?? undefined,
+      parent: containerRef?.current,
       physics: {
         default: "arcade",
         arcade: {
@@ -28,25 +37,38 @@ const GameCanvas: React.FC = () => {
       scene: [StartScene, MainScene],
     };
 
-    const game = new Phaser.Game(config);
+    game = new Phaser.Game(config);
 
-    const resize = () => {
-      const isMobile = window.innerWidth < 800;
-      const newWidth = isMobile ? window.innerWidth : 800;
-      const newHeight = isMobile ? Math.min(400, window.innerHeight) : 400;
+    function handleResize() {
+      const { width: newWidth, height: newHeight } = getGameDimensions();
+      game?.scale.resize(newWidth, newHeight);
+    }
 
-      game.scale.resize(newWidth, newHeight);
-    };
-
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", resize);
-      game.destroy(true);
+      window.removeEventListener("resize", handleResize);
+      game?.destroy(true);
     };
-  }, []);
+  }, [containerRef]);
+};
 
-  return <div ref={gameRef} />;
+const GameCanvas: React.FC = () => {
+  const gameRef = useRef<HTMLDivElement>(null);
+  usePhaserGame(gameRef);
+
+  return (
+    <div
+      ref={gameRef}
+      className="rounded-2xl shadow-lg border border-slate-200 overflow-hidden"
+      role="region"
+      aria-label="Mini game 2D: Ajude a salvar o React do bug!"
+      tabIndex={0}
+      style={{
+        outline: "none",
+      }}
+    />
+  );
 };
 
 export default GameCanvas;
