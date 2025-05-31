@@ -45,10 +45,7 @@ export default class MainScene extends Phaser.Scene {
       "btn_jump",
       import.meta.env.BASE_URL + "assets/ButtonJump.png"
     );
-    this.load.image(
-      "bug",
-      "https://opengameart.org/sites/default/files/enemy-bug.png"
-    );
+    this.load.image("bug", import.meta.env.BASE_URL + "assets/bug.png");
   }
 
   create() {
@@ -68,17 +65,28 @@ export default class MainScene extends Phaser.Scene {
     }
 
     // Mapa e chão
-    this.physics.world.setBounds(0, 0, 1600, 600);
-    this.cameras.main.setBounds(0, 0, 1600, 600);
+    this.physics.world.setBounds(0, 0, 2000, 600);
+    this.cameras.main.setBounds(0, 0, 2000, 600);
     this.ground = this.physics.add.staticGroup();
-    this.ground.create(300, 610, "ground").setScale(1).refreshBody();
+
+    const platforms = [
+      { x: 0, y: 610, scale: 1 },
+      { x: 640, y: 560, scale: 1.2 },
+      { x: 1300, y: 610, scale: 0.7 },
+      { x: 1800, y: 610, scale: 1 },
+    ];
+
+    platforms.forEach(({ x, y, scale }) => {
+      this.ground.create(x, y, "ground").setScale(scale).refreshBody();
+    });
 
     // Player
     this.player = this.physics.add
-      .sprite(100, 460, "player_idle")
+      .sprite(0, 460, "player_idle")
       .setOrigin(0.5, 1);
     this.player.setCollideWorldBounds(true);
     this.player.setOffset(0, -8);
+    this.player.setSize(55, 108);
 
     // Animações
     this.createAnimations();
@@ -93,7 +101,7 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.ground);
 
     // Inimigos
-    this.spawnBug(400, 565);
+    this.spawnBug(550, 500);
 
     // Evita scroll ao pressionar espaço
     window.addEventListener("keydown", (e) => {
@@ -122,7 +130,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     // Pulo
-    if (jump && isTouchingGround) this.player.setVelocityY(-330);
+    if (jump && isTouchingGround) this.player.setVelocityY(-400);
 
     // Animação
     if (!isTouchingGround) this.player.play("jump", true);
@@ -214,7 +222,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private spawnBug(x: number, y: number) {
-    const bug = this.physics.add.sprite(x, y, "bug").setScale(1);
+    const bug = this.physics.add.sprite(x, y, "bug").setScale(0.35);
     bug.setImmovable(true);
     bug.body.allowGravity = false;
     this.physics.add.overlap(this.player, bug, () => this.handlePlayerDeath());
