@@ -4,11 +4,11 @@
   --font-primary: "Inter", sans-serif;
   --font-secondary: "Space Grotesk", sans-serif;
 
-  --text-theme: #0f0602;
-  --bg-theme: #ffffff;
-  --bg-theme-blue: #f0f5fa;
-  --bg-dark-theme: #0f0602;
-  --primary-theme: #0070d1;
+  --color-text: #0f0602;
+  --color-background: #ffffff;
+  --color-foreground-blue: #f0f5fa;
+  --color-foreground-dark: #0f0602;
+  --color-primary: #0070d1;
 }
 
 html {
