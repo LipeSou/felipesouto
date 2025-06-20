@@ -8,14 +8,51 @@
   --color-background: #ffffff;
   --color-foreground-blue: #f0f5fa;
   --color-foreground-dark: #0f0602;
-  --color-primary: #0070d1;
+  --color-primary-400: #bbf6f5;
+  --color-primary-600: #68cac9;
+  --color-primary-800: #307a79;
+  --color-primary-900: #1b5453;
 }
 
 html {
+  width: 100vw;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes scroll-dot {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.animate-scroll-dot {
+  animation: scroll-dot 1.6s infinite ease-in-out;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s infinite;
 }

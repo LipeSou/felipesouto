@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/use-case/layout/header";
 
 const inter = Inter({
   variable: "--font-primary",
@@ -48,6 +49,7 @@ export default function RootLayout({
         antialiased 
         selection:bg-primary/20`}
       >
+        <Header />
         {children}
       </body>
     </html>
