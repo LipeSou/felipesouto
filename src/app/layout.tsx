@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/use-case/layout/header";
+import Footer from "@/components/use-case/layout/footer";
 
 const inter = Inter({
   variable: "--font-primary",
@@ -51,6 +52,7 @@ export default function RootLayout({
       >
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );
