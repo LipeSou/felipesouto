@@ -55,3 +55,18 @@ html {
 .animate-bounce-slow {
   animation: bounce-slow 2s infinite;
 }
+
+@layer utilities {
+  @keyframes pulse-fast {
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  .animate-pulse-fast {
+    animation: pulse-fast 1s steps(1) infinite;
+  }
+}

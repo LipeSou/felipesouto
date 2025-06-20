@@ -1,60 +1,81 @@
 "use client";
 
 import { IconChevronDown, IconMouse } from "@tabler/icons-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function SectionOne() {
-  const phrase = "Oi! Eu sou Felipe, um desenvolvedor Front-End com ";
-  const wordAlma = "alma!";
+  const phrases = [
+    "<Oi! />",
+    "<Eu sou Felipe, />",
+    "<Um desenvolvedor Front-End com alma! />",
+  ];
+  const [phraseIndex, setPhraseIndex] = useState(0); // Current phrase index
+  const [typedText, setTypedText] = useState(""); // Text currently displayed
+  const [isTyping, setIsTyping] = useState(true);
 
-  const parent = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.045,
-      },
-    },
-  };
+  useEffect(() => {
+    setTypedText(""); // Always clear before typing a new phrase
+    setIsTyping(true);
 
-  const child = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { opacity: 1, y: 0 },
-  };
+    let current = 0;
+    const type = () => {
+      if (current <= phrases[phraseIndex].length) {
+        setTypedText(phrases[phraseIndex].slice(0, current));
+        current++;
+        setTimeout(type, 45); // Typing speed (ms)
+      } else {
+        setIsTyping(false);
+        // Wait and then go to next phrase, if there is one
+        if (phraseIndex < phrases.length - 1) {
+          setTimeout(() => setPhraseIndex(phraseIndex + 1), 1100); // Wait time between phrases
+        }
+      }
+    };
+    type();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phraseIndex]);
 
+  // Hide previous phrase after a short delay, except the last one (keep)
+  useEffect(() => {
+    if (!isTyping && phraseIndex < phrases.length - 1) {
+      const timeout = setTimeout(() => setTypedText(""), 700);
+      return () => clearTimeout(timeout);
+    }
+  }, [isTyping, phraseIndex]);
   return (
     <section className="pt-32 h-dvh md:pt-60 px-20 md:grid md:grid-cols-[40%_60%]">
       <div>
-        <motion.h1
-          className="text-center text-4xl md:text-7xl font-heading font-secondary"
-          variants={parent}
-          initial="hidden"
-          animate="visible"
-        >
-          {phrase.split("").map((char, idx) => (
+        <h1 className="text-4xl md:text-7xl font-heading font-secondary h-[2.5em] flex items-center">
+          <AnimatePresence mode="wait">
             <motion.span
-              key={char + idx}
-              variants={child}
-              style={{ display: char === " " ? "inline-block" : "inline" }}
-            >
-              {char === " " ? "\u00A0" : char}
-            </motion.span>
-          ))}
-          {/* Alma destacada */}
-          {wordAlma.split("").map((char, idx) => (
-            <motion.span
-              key={"alma" + idx}
-              variants={child}
-              className="font-bold"
-              style={{
-                color: "#68cac9",
-                fontFamily: "Space Grotesk, sans-serif",
-                display: char === " " ? "inline-block" : "inline",
+              key={phraseIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                transition: { type: "spring", duration: 0.7 },
               }}
+              exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
             >
-              {char === " " ? "\u00A0" : char}
+              {typedText}
+              {/* Blinking cursor */}
+              <span
+                className={`inline-block w-2 animate-pulse-fast`}
+                style={{
+                  color: "#0f0602", // preto do seu tema
+                  marginLeft: "2px",
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                  fontSize: "0.7em",
+                  opacity: 0.8,
+                }}
+              >
+                |
+              </span>
             </motion.span>
-          ))}
-        </motion.h1>
+          </AnimatePresence>
+        </h1>
       </div>
       <div className=""></div>
       <div
