@@ -1,4 +1,4 @@
-import type { Experiences } from "../types/timeline";
+import type { Experiences } from "@/types/timeline";
 
 export const myExperiences: Experiences[] = [
   {
