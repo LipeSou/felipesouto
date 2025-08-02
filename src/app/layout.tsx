@@ -45,7 +45,7 @@ export default function RootLayout({
       <body
         className={` ${inter.variable} ${grotesk.variable} 
         font-primary
-        bg-foreground-blue
+        bg-background
         text-text
         antialiased 
         selection:bg-primary/20`}

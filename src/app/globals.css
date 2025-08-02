@@ -23,18 +23,13 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@keyframes scroll-dot {
-  0% {
-    transform: translateY(0);
+@keyframes pulse-fast {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
-    transform: translateY(6px);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
+    opacity: 0.3;
   }
 }
 
@@ -44,29 +39,14 @@ html {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(8px);
+    transform: translateY(-10px);
   }
 }
 
-.animate-scroll-dot {
-  animation: scroll-dot 1.6s infinite ease-in-out;
+.animate-pulse-fast {
+  animation: pulse-fast 1s ease-in-out infinite;
 }
 
 .animate-bounce-slow {
-  animation: bounce-slow 2s infinite;
-}
-
-@layer utilities {
-  @keyframes pulse-fast {
-    0%,
-    100% {
-      opacity: 0.8;
-    }
-    50% {
-      opacity: 0;
-    }
-  }
-  .animate-pulse-fast {
-    animation: pulse-fast 1s steps(1) infinite;
-  }
+  animation: bounce-slow 2s ease-in-out infinite;
 }
