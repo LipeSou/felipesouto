@@ -42,7 +42,7 @@ export default function Hero() {
     }
   }, [isTyping, phraseIndex, phrases.length]);
   return (
-    <section className=" w-[50vw] md:pl-20">
+    <section className="w-full px-6 md:w-[50vw] md:px-0 md:pl-20">
       <h1 className="text-2xl md:text-7xl font-heading font-secondary h-[2.5em] flex items-center">
         <AnimatePresence mode="wait">
           <motion.span

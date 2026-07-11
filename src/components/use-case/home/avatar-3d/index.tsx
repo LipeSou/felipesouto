@@ -2,14 +2,15 @@
 
 import React, { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import type { MotionValue } from "framer-motion";
 import Avatar3DModel from "./avatar-3d-model";
 
 type Avatar3DProps = {
   animation: string;
+  progress: MotionValue<number>;
 };
 
-export function Avatar3D({ animation }: Avatar3DProps) {
+export function Avatar3D({ animation, progress }: Avatar3DProps) {
   function LoadingSpinner() {
     return (
       <div className="flex items-center justify-center h-full">
@@ -18,23 +19,17 @@ export function Avatar3D({ animation }: Avatar3DProps) {
     );
   }
   return (
-    <div className="w-[40vw] h-[100vh] relative">
+    <div className="w-full h-full relative">
       <Canvas
         shadows
         camera={{ position: [0, 2, 5], fov: 30 }}
         className="w-full h-full"
       >
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          maxPolarAngle={Math.PI / 2}
-          minPolarAngle={Math.PI / 2}
-        />
         <directionalLight position={[10, 10, 5]} intensity={1} />
 
         <ambientLight intensity={2} />
         <Suspense fallback={null}>
-          <Avatar3DModel animation={animation} />
+          <Avatar3DModel animation={animation} progress={progress} />
         </Suspense>
       </Canvas>
       <Suspense fallback={<LoadingSpinner />}>
