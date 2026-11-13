@@ -8,9 +8,21 @@ import Avatar3DModel from "./avatar-3d-model";
 type Avatar3DProps = {
   animation: string;
   progress: MotionValue<number>;
+  // Cor da tech em foco; null = câmera na posição normal.
+  focusColor: string | null;
+  lookX: MotionValue<number>;
+  lookY: MotionValue<number>;
+  speaking: MotionValue<number>;
 };
 
-export function Avatar3D({ animation, progress }: Avatar3DProps) {
+export function Avatar3D({
+  animation,
+  progress,
+  focusColor,
+  lookX,
+  lookY,
+  speaking,
+}: Avatar3DProps) {
   function LoadingSpinner() {
     return (
       <div className="flex items-center justify-center h-full">
@@ -29,7 +41,14 @@ export function Avatar3D({ animation, progress }: Avatar3DProps) {
 
         <ambientLight intensity={2} />
         <Suspense fallback={null}>
-          <Avatar3DModel animation={animation} progress={progress} />
+          <Avatar3DModel
+            animation={animation}
+            progress={progress}
+            focusColor={focusColor}
+            lookX={lookX}
+            lookY={lookY}
+            speaking={speaking}
+          />
         </Suspense>
       </Canvas>
       <Suspense fallback={<LoadingSpinner />}>
