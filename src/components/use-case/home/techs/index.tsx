@@ -17,9 +17,9 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type PointerEvent,
 } from "react";
 import { myTechs } from "@/app/constants/myTechs";
+import { GroundRing } from "../ground-ring";
 import { FocusGlobe } from "./focus-globe";
 import { SolarSystem, type FocusOrigin } from "./solar-system";
 import {
@@ -35,9 +35,6 @@ type TechsProps = {
   active: boolean;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
-  // Para onde o avatar olha, de -1 a 1 em cada eixo.
-  lookX: MotionValue<number>;
-  lookY: MotionValue<number>;
   speaking: MotionValue<number>;
 };
 
@@ -48,8 +45,6 @@ type Geometry = {
   globe: number;
   center: { x: number; y: number };
   anchor: { x: number; y: number };
-  // Posição aproximada da cabeça do avatar na tela, para o olhar.
-  head: { x: number; y: number };
   panel: CSSProperties;
   // Título do detalhe em px: cabe em uma linha na largura do painel.
   titleSize: number;
@@ -75,7 +70,6 @@ function computeGeometry(w: number, h: number): Geometry | null {
       globe,
       center: { x: 0.3 * w, y: 0.58 * h + 10 },
       anchor: { x: 0, y: 0.58 * h },
-      head: { x: 0.8 * w, y: 0.27 * h },
       panel: { left, top: 96, width, height: h - 96 },
       titleSize: clamp(width / 8, 30, 56),
       showRelated: true,
@@ -92,7 +86,6 @@ function computeGeometry(w: number, h: number): Geometry | null {
     globe,
     center: { x: 0.5 * w, y: 0.35 * h },
     anchor: { x: 0.5 * w, y: -0.12 * w },
-    head: { x: 0.5 * w, y: 0.59 * h - 112 },
     // Vai até o rodapé da seção: o texto fica em cima e a navegação
     // desce para a faixa livre abaixo do avatar.
     panel: {
@@ -110,8 +103,6 @@ export default function Techs({
   active,
   selectedId,
   onSelect,
-  lookX,
-  lookY,
   speaking,
 }: TechsProps) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -164,8 +155,6 @@ export default function Techs({
       setExplored(true);
       setHoveredId(null);
       setStageHover(false);
-      lookX.set(0);
-      lookY.set(0);
     }
     const controls = animate(focus, selectedId ? 1 : 0, {
       duration: reducedMotion ? 0.01 : selectedId ? 1.1 : 0.85,
@@ -175,7 +164,7 @@ export default function Techs({
       },
     });
     return () => controls.stop();
-  }, [selectedId, reducedMotion, focus, lookX, lookY]);
+  }, [selectedId, reducedMotion, focus]);
 
   const select = useCallback(
     (id: string) => {
@@ -220,19 +209,11 @@ export default function Techs({
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedId, close, step]);
 
-  // O avatar acompanha o cursor enquanto o usuário explora as órbitas.
-  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
-    if (!active || selectedId || !geo) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
-    lookX.set(clamp((px - geo.head.x) / (box.w * 0.5), -1, 1));
-    lookY.set(clamp((py - geo.head.y) / (box.h * 0.5), -1, 1));
-  };
-  const handlePointerLeave = () => {
-    lookX.set(0);
-    lookY.set(0);
-  };
+  // Conta os pousos: cada um dispara a ondulação do anel do chão.
+  const [landings, setLandings] = useState(0);
+  useEffect(() => {
+    if (active) setLandings((count) => count + 1);
+  }, [active]);
 
   const selectedTech = myTechs.find((t) => t.id === selectedId) ?? null;
   const shownTech = myTechs.find((t) => t.id === shownId) ?? null;
@@ -244,16 +225,20 @@ export default function Techs({
       // overflow-clip (não hidden): o globo sai da seção e um container
       // rolável seria deslocado pelo browser ao focar um planeta.
       className="relative h-screen overflow-clip bg-background"
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
     >
+      {/* Plataforma de pouso: ondula no impacto e some no foco. */}
+      <GroundRing visible={active} pulseKey={landings} opacity={titleOpacity} />
+
       <motion.div
-        className="absolute left-6 right-6 top-[4.5rem] z-[1] text-center md:left-20 md:right-auto md:top-32 md:max-w-md md:text-left"
+        className="absolute left-6 right-6 top-[4.5rem] z-[1] text-center md:left-20 md:right-auto md:top-28 md:max-w-md md:text-left"
         style={{
           opacity: titleOpacity,
           pointerEvents: selectedId ? "none" : "auto",
         }}
       >
+        <p className="mb-3 hidden font-secondary text-[11px] uppercase tracking-[0.2em] text-primary-800 md:block">
+          02 — Stack
+        </p>
         <h2 className="font-secondary text-3xl font-bold md:text-5xl">
           Tecnologias
         </h2>

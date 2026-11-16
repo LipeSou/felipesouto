@@ -2,7 +2,12 @@
 
 import React, { useEffect, useRef } from "react";
 import { useFrame, useGraph } from "@react-three/fiber";
-import { useAnimations, useFBX, useGLTF } from "@react-three/drei";
+import {
+  ContactShadows,
+  useAnimations,
+  useFBX,
+  useGLTF,
+} from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 import {
   Color,
@@ -11,6 +16,9 @@ import {
   Object3D,
   Quaternion,
   Vector3,
+  type Group,
+  type Mesh,
+  type MeshBasicMaterial,
   type Object3DEventMap,
   type PointLight,
   type SkinnedMesh,
@@ -25,10 +33,17 @@ interface Avatar3DProps {
   lookX: MotionValue<number>;
   lookY: MotionValue<number>;
   speaking: MotionValue<number>;
+  // 1 = fora do quadro, no alto; 0 = no chão. Dirige a queda de entrada.
+  introY: MotionValue<number>;
+  // 0–1: sorriso extra (ex.: cursor sobre o botão de contato).
+  mood: MotionValue<number>;
+  onReady?: () => void;
 }
 
 const DEFAULT_CAMERA = new Vector3(0, 2, 5);
 const ORIGIN = new Vector3(0, 0, 0);
+const INTRO_HEIGHT = 3.2;
+const SHADOW_OPACITY = 0.5;
 
 // Rotação extra aplicada por cima da animação. O mixer só reescreve o
 // osso quando o valor do clip muda, então desfazemos o offset anterior
@@ -49,6 +64,7 @@ function applyBoneOffset(bone: Object3D, state: BoneOffset, offset: Quaternion) 
   state.applied.copy(bone.quaternion);
 }
 
+// Ignora em silêncio morphs que o modelo não tem.
 function setMorph(mesh: SkinnedMesh | undefined, name: string, value: number) {
   const index = mesh?.morphTargetDictionary?.[name];
   if (mesh?.morphTargetInfluences && index !== undefined) {
@@ -57,14 +73,28 @@ function setMorph(mesh: SkinnedMesh | undefined, name: string, value: number) {
 }
 
 export default function Avatar3DModel(props: Avatar3DProps) {
-  const { animation, progress, focusColor, lookX, lookY, speaking } = props;
+  const {
+    animation,
+    progress,
+    focusColor,
+    lookX,
+    lookY,
+    speaking,
+    introY,
+    mood,
+    onReady,
+  } = props;
   const group = useRef<Object3D<Object3DEventMap> | null>(null);
   const light = useRef<PointLight>(null);
+  const shadow = useRef<Group>(null);
   const rig = useRef({
+    baseY: 0,
     focus: 0,
     lookX: 0,
     lookY: 0,
     mouth: 0,
+    smile: 0,
+    blinkAt: 2,
     hasHead: false,
     head: new Vector3(),
     headNow: new Vector3(),
@@ -79,9 +109,17 @@ export default function Avatar3DModel(props: Avatar3DProps) {
     neckState: makeBoneOffset(),
   });
   const { scene } = useGLTF("/models/684a2a502f4b144e19983160.glb");
-  const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
+  const clone = React.useMemo(() => {
+    const cloned = SkeletonUtils.clone(scene);
+    // Malhas com skin se deformam para fora da bounding box original:
+    // sem isto somem quando a câmera fecha no rosto.
+    cloned.traverse((child) => {
+      if ((child as Mesh).isMesh) child.frustumCulled = false;
+    });
+    return cloned;
+  }, [scene]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { nodes, materials } = useGraph(clone) as any;
+  const { nodes } = useGraph(clone) as any;
 
   const { animations: StandingGreeting } = useFBX(
     "/animations/StandingGreeting.fbx"
@@ -106,17 +144,28 @@ export default function Avatar3DModel(props: Avatar3DProps) {
     [0, 0.35, 0.35, -0.12, 0]
   );
   const xOffset = useTransform(progress, [0.15, 0.45, 0.8], [0, -0.25, 0]);
+  // A sombra some quando ele sai do chão e volta ao pousar.
+  const grounded = useTransform(
+    progress,
+    [0, 0.06, 0.18, 0.8, 0.92, 1],
+    [1, 1, 0, 0, 1, 1]
+  );
+
+  useEffect(() => {
+    onReady?.();
+    // Só na montagem: avisa a página que o modelo carregou.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Registrado depois do useAnimations: roda após o mixer em cada frame,
   // então o que é escrito nos ossos aqui vale por cima do clip.
   useFrame((state, delta) => {
     if (!group.current) return;
-    group.current.position.y = MathUtils.damp(
-      group.current.position.y,
-      yOffset.get(),
-      6,
-      delta
-    );
+    const r = rig.current;
+    const intro = introY.get();
+
+    r.baseY = MathUtils.damp(r.baseY, yOffset.get(), 6, delta);
+    group.current.position.y = r.baseY + intro * INTRO_HEIGHT;
     group.current.position.x = MathUtils.damp(
       group.current.position.x,
       xOffset.get(),
@@ -124,7 +173,12 @@ export default function Avatar3DModel(props: Avatar3DProps) {
       delta
     );
 
-    const r = rig.current;
+    const shadowMesh = shadow.current?.children[0] as Mesh | undefined;
+    if (shadowMesh) {
+      (shadowMesh.material as MeshBasicMaterial).opacity =
+        SHADOW_OPACITY * grounded.get() * MathUtils.clamp(1 - intro * 2, 0, 1);
+    }
+
     const head = nodes.Head as Object3D | undefined;
     const neck = nodes.Neck as Object3D | undefined;
 
@@ -183,18 +237,39 @@ export default function Avatar3DModel(props: Avatar3DProps) {
       }
     }
 
-    // Boca mexe enquanto o texto do detalhe é digitado.
     const time = state.clock.elapsedTime;
+    const face = nodes.Wolf3D_Head as SkinnedMesh | undefined;
+    const teeth = nodes.Wolf3D_Teeth as SkinnedMesh | undefined;
+
+    // Boca mexe enquanto um texto é digitado.
     const mouthTarget =
       speaking.get() > 0
         ? 0.1 +
           0.3 * Math.abs(Math.sin(time * 11)) * (0.6 + 0.4 * Math.sin(time * 3.7))
         : 0;
     r.mouth = MathUtils.damp(r.mouth, mouthTarget, 14, delta);
-    setMorph(nodes.Wolf3D_Head, "mouthOpen", r.mouth);
-    setMorph(nodes.Wolf3D_Teeth, "mouthOpen", r.mouth);
-    setMorph(nodes.Wolf3D_Head, "mouthSmile", t * 0.3);
-    setMorph(nodes.Wolf3D_Teeth, "mouthSmile", t * 0.3);
+    setMorph(face, "mouthOpen", r.mouth);
+    setMorph(teeth, "mouthOpen", r.mouth);
+
+    r.smile = MathUtils.damp(
+      r.smile,
+      Math.max(t * 0.3, mood.get() * 0.45),
+      6,
+      delta
+    );
+    setMorph(face, "mouthSmile", r.smile);
+    setMorph(teeth, "mouthSmile", r.smile);
+
+    // Piscar em intervalos irregulares.
+    const since = time - r.blinkAt;
+    let blink = 0;
+    if (since >= 0) {
+      if (since < 0.16) blink = Math.sin((since / 0.16) * Math.PI);
+      else r.blinkAt = time + 2 + Math.random() * 4;
+    }
+    setMorph(face, "eyeBlinkLeft", blink);
+    setMorph(face, "eyeBlinkRight", blink);
+    setMorph(face, "eyesClosed", blink);
   });
 
   useEffect(() => {
@@ -209,67 +284,21 @@ export default function Avatar3DModel(props: Avatar3DProps) {
 
   return (
     <>
-    <pointLight ref={light} intensity={0} distance={6} decay={2} />
-    <group ref={group} dispose={null}>
-      <primitive object={clone} scale={1} position={[0, -1, 0]} />
-      <skinnedMesh
-        geometry={nodes.Wolf3D_Hair.geometry}
-        material={materials.Wolf3D_Hair}
-        skeleton={nodes.Wolf3D_Hair.skeleton}
+      <pointLight ref={light} intensity={0} distance={6} decay={2} />
+      <ContactShadows
+        ref={shadow}
+        position={[0, -1, 0]}
+        scale={5}
+        far={2.4}
+        blur={2.6}
+        resolution={256}
+        opacity={SHADOW_OPACITY}
+        color="#12302f"
       />
-      <skinnedMesh
-        geometry={nodes.Wolf3D_Outfit_Top.geometry}
-        material={materials.Wolf3D_Outfit_Top}
-        skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
-      />
-      <skinnedMesh
-        geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
-        material={materials.Wolf3D_Outfit_Bottom}
-        skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
-      />
-      <skinnedMesh
-        geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
-        material={materials.Wolf3D_Outfit_Footwear}
-        skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
-      />
-      <skinnedMesh
-        geometry={nodes.Wolf3D_Body.geometry}
-        material={materials.Wolf3D_Body}
-        skeleton={nodes.Wolf3D_Body.skeleton}
-      />
-      <skinnedMesh
-        name="EyeLeft"
-        geometry={nodes.EyeLeft.geometry}
-        material={materials.Wolf3D_Eye}
-        skeleton={nodes.EyeLeft.skeleton}
-        morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary}
-        morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
-      />
-      <skinnedMesh
-        name="EyeRight"
-        geometry={nodes.EyeRight.geometry}
-        material={materials.Wolf3D_Eye}
-        skeleton={nodes.EyeRight.skeleton}
-        morphTargetDictionary={nodes.EyeRight.morphTargetDictionary}
-        morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
-      />
-      <skinnedMesh
-        name="Wolf3D_Head"
-        geometry={nodes.Wolf3D_Head.geometry}
-        material={materials.Wolf3D_Skin}
-        skeleton={nodes.Wolf3D_Head.skeleton}
-        morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary}
-        morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
-      />
-      <skinnedMesh
-        name="Wolf3D_Teeth"
-        geometry={nodes.Wolf3D_Teeth.geometry}
-        material={materials.Wolf3D_Teeth}
-        skeleton={nodes.Wolf3D_Teeth.skeleton}
-        morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
-        morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
-      />
-    </group>
+      {/* O clone já contém esqueleto e malhas: é desenhado uma vez só. */}
+      <group ref={group} dispose={null}>
+        <primitive object={clone} scale={1} position={[0, -1, 0]} />
+      </group>
     </>
   );
 }

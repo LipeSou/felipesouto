@@ -3,7 +3,10 @@ import { Timeline } from "../../../common/time-line";
 
 export default function Experiences() {
   return (
-    <div className="w-full bg-background  flex items-center justify-center">
+    <div
+      id="experiencias"
+      className="flex w-full scroll-mt-16 items-center justify-center bg-background"
+    >
       <div className="w-[90vw]  ">
         <Timeline data={myExperiences} />
       </div>

@@ -26,6 +26,9 @@ export const Timeline = ({ data }: { data: Experiences[] }) => {
   return (
     <div className="w-full md:px-10" ref={containerRef}>
       <div className="max-w-7xl mx-auto pt-20 px-4 md:px-8 lg:px-10">
+        <p className="mb-3 hidden font-secondary text-[11px] uppercase tracking-[0.2em] text-primary-800 md:block">
+          03 — Trajetória
+        </p>
         <h2 className="font-primary text-2xl md:text-4xl mb-6  max-w-4xl">
           Minhas experiências
         </h2>

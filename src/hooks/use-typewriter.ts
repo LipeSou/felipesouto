@@ -9,17 +9,24 @@ type TypewriterOptions = {
   startDelay?: number;
   // false = mostra o texto inteiro de uma vez (ex.: reduced motion).
   enabled?: boolean;
+  // true = ainda não começa a digitar (ex.: esperando a entrada do avatar).
+  paused?: boolean;
 };
 
 export function useTypewriter(
   text: string,
-  { speed = 22, startDelay = 0, enabled = true }: TypewriterOptions = {}
+  {
+    speed = 22,
+    startDelay = 0,
+    enabled = true,
+    paused = false,
+  }: TypewriterOptions = {}
 ) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     setCount(0);
-    if (!enabled) return;
+    if (!enabled || paused) return;
 
     let current = 0;
     let timer: ReturnType<typeof setTimeout>;
@@ -30,7 +37,7 @@ export function useTypewriter(
     };
     timer = setTimeout(tick, startDelay);
     return () => clearTimeout(timer);
-  }, [text, speed, startDelay, enabled]);
+  }, [text, speed, startDelay, enabled, paused]);
 
   const shown = enabled ? Math.min(count, text.length) : text.length;
   return {

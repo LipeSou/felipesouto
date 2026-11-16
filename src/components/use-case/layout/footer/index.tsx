@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="bg-foreground-dark md:px-20 px-4 mt-44 pt-20 md:pt-28 pb-12   text-white">
+    <footer id="contato" className="bg-foreground-dark md:px-20 px-4 mt-44 pt-20 md:pt-28 pb-12   text-white">
       <div className="w-full flex items-center justify-center pb-12 text-center">
         <p className="text-5xl md:text-[60px]">Vamos conversar!</p>
       </div>

@@ -33,13 +33,13 @@ html {
   }
 }
 
-@keyframes bounce-slow {
-  0%,
-  100% {
-    transform: translateY(0);
+/* Traço que desce pela linha da dica de scroll do hero. */
+@keyframes scroll-line {
+  0% {
+    transform: translateY(-110%);
   }
-  50% {
-    transform: translateY(-10px);
+  100% {
+    transform: translateY(260%);
   }
 }
 
@@ -47,6 +47,13 @@ html {
   animation: pulse-fast 1s ease-in-out infinite;
 }
 
-.animate-bounce-slow {
-  animation: bounce-slow 2s ease-in-out infinite;
+.animate-scroll-line {
+  animation: scroll-line 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* Links do header rolam suave até a seção, exceto com movimento reduzido. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

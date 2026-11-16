@@ -2,6 +2,7 @@
 
 import React, { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
+import { Environment, Lightformer } from "@react-three/drei";
 import type { MotionValue } from "framer-motion";
 import Avatar3DModel from "./avatar-3d-model";
 
@@ -13,47 +14,56 @@ type Avatar3DProps = {
   lookX: MotionValue<number>;
   lookY: MotionValue<number>;
   speaking: MotionValue<number>;
+  introY: MotionValue<number>;
+  mood: MotionValue<number>;
+  onReady?: () => void;
 };
 
-export function Avatar3D({
-  animation,
-  progress,
-  focusColor,
-  lookX,
-  lookY,
-  speaking,
-}: Avatar3DProps) {
-  function LoadingSpinner() {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+export function Avatar3D(props: Avatar3DProps) {
   return (
-    <div className="w-full h-full relative">
+    <div className="relative h-full w-full">
       <Canvas
-        shadows
+        dpr={[1, 2]}
         camera={{ position: [0, 2, 5], fov: 30 }}
-        className="w-full h-full"
+        className="h-full w-full"
       >
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-
-        <ambientLight intensity={2} />
-        <Suspense fallback={null}>
-          <Avatar3DModel
-            animation={animation}
-            progress={progress}
-            focusColor={focusColor}
-            lookX={lookX}
-            lookY={lookY}
-            speaking={speaking}
+        {/* Estúdio procedural (sem baixar HDR): painéis de luz suaves dão
+            volume ao rosto e à roupa em vez da luz ambiente chapada. */}
+        <Environment resolution={256}>
+          <Lightformer
+            form="rect"
+            intensity={1.7}
+            position={[0, 4, 4]}
+            scale={[8, 5, 1]}
           />
+          <Lightformer
+            form="rect"
+            intensity={1.1}
+            position={[-5, 1.5, 2]}
+            scale={[4, 6, 1]}
+          />
+          <Lightformer
+            form="rect"
+            intensity={1.1}
+            position={[5, 1.5, 2]}
+            scale={[4, 6, 1]}
+          />
+          <Lightformer
+            form="rect"
+            color="#68cac9"
+            intensity={3}
+            position={[0, 2.5, -5]}
+            scale={[8, 5, 1]}
+          />
+        </Environment>
+        <ambientLight intensity={0.35} />
+        <directionalLight position={[3, 5, 4]} intensity={1.1} />
+        {/* Contraluz na cor da marca: recorta a silhueta. */}
+        <directionalLight position={[-3, 3, -4]} color="#68cac9" intensity={2.2} />
+        <Suspense fallback={null}>
+          <Avatar3DModel {...props} />
         </Suspense>
       </Canvas>
-      <Suspense fallback={<LoadingSpinner />}>
-        <div className="absolute inset-0 pointer-events-none"></div>
-      </Suspense>
     </div>
   );
 }

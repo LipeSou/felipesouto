@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/use-case/layout/header";
@@ -30,9 +30,12 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Felipe Souto", url: "https://felipesouto.dev" }],
   metadataBase: new URL("https://felipesouto.dev"),
-  themeColor: "#ffffff",
   creator: "Felipe Souto",
   robots: "index, follow",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -41,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body
         className={` ${inter.variable} ${grotesk.variable} 
         font-primary
